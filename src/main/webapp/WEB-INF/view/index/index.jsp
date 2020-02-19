@@ -61,7 +61,7 @@ li {
 </style>
 </head>
 <body>
-
+	
 	<div class="container-fluid">
 		<div class="row" style="height: 34px; background-color: #222222">
 			<a href="#"><font color="#FFFFFF" size="3px">下载APP &nbsp;</font></a>
@@ -94,6 +94,15 @@ li {
 				</ul>
 			</div>
 			<div class="col-md-7">
+			<!-- 查询 -->
+		<form action="/article/search" method="get">
+			<div class="input-group mb-3">
+  				<input type="text" name="key" value="${key}" class="form-control" placeholder="输入搜索" aria-label="Recipient's username" aria-describedby="button-addon2">
+  					<div class="input-group-append">
+    					<button class="btn btn-outline-secondary" id="button-addon2">搜索</button>
+  					</div>
+			</div>
+		</form>
 				<!--轮播图-->
 				<c:if test="${null==article.channelId }">
 					<div>
@@ -198,9 +207,9 @@ li {
 		function goPage(page) {
               var  channelId='${article.channelId}';
               var  categoryId='${article.categoryId}';
-              
+              var key='${key}'
 			location.href = "?channelId="+channelId+"&categoryId="+categoryId+"&page="
-					+ page;
+					+ page +"&key="+ key;
 
 		}
 	</script>

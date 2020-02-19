@@ -29,7 +29,7 @@
 					<a id="aaa" href="#" data="/my/article/articles" class="list-group-item list-group-item-action active">
 						我的文章 </a> <a href="#" data="/my/article/publish"
 						class="list-group-item list-group-item-action">发布文章</a> <a
-						href="#" class="list-group-item list-group-item-action">我的收藏</a>
+						href="#" class="list-group-item list-group-item-action" data="/my/article/sc">我的收藏</a>
 						<a
 						href="#" class="list-group-item list-group-item-action" data="/my/article/comments">我的评论</a>
 						 <a
@@ -57,7 +57,7 @@
 <script type="text/javascript">
 	$(function() {
 		 //默认现在我的文章列表
-		$("#center").load("/my/article/articles");
+		$("#center").load("my/article/sc");
 		
 
 		//为a标签添加点击事件

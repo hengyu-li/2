@@ -30,4 +30,10 @@ public class ChannelServiceImpl implements ChannelService {
 		return categoryMapper.selectsByChannelId(channelId);
 	}
 
+	@Override
+	public int getChannelCount() {
+		// TODO Auto-generated method stub
+		return channerMapper.getChannelCount();
+	}
+
 }

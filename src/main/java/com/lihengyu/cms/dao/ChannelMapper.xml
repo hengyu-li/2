@@ -96,4 +96,7 @@
       sorted = #{sorted,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="getChannelCount" resultMap="BaseResultMap">
+  	select count(*) from channel
+  </select>
 </mapper>

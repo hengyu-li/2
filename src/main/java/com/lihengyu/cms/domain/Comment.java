@@ -2,6 +2,9 @@ package com.lihengyu.cms.domain;
 
 import java.util.Date;
 
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 /**
   * 
   * @ClassName: Comment 
@@ -13,6 +16,7 @@ public class Comment {
 
 	private Integer id;
 	private Integer userId;
+	@Field(index=true,analyzer="ik_smart",store=true,searchAnalyzer="ik_smart",type = FieldType.text)
 	private String content;
 	private Date created;//评论时间
 	private Integer articleId;//文章 

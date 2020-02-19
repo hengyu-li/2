@@ -3,6 +3,11 @@ package com.lihengyu.cms.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 /**
  * 
  * @ClassName: Article
@@ -10,6 +15,7 @@ import java.util.Date;
  * @author: charles
  * @date: 2019年12月10日 下午3:08:27
  */
+@Document(indexName="cms_article",type="article")
 public class Article implements Serializable {
 	/**
 	 * @fieldName: serialVersionUID
@@ -17,9 +23,9 @@ public class Article implements Serializable {
 	 * @Description: TODO
 	 */
 	private static final long serialVersionUID = 1L;
-
+	@Id
 	private Integer id;
-
+	@Field(index=true,analyzer="ik_smart",store=true,searchAnalyzer="ik_smart",type = FieldType.text)
 	private String title;
 
 	private String picture;

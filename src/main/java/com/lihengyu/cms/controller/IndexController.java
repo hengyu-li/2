@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,8 +51,13 @@ public class IndexController {
 	@Resource
 	private CommentService commentService;
 	
+	@SuppressWarnings("rawtypes")
+	@Autowired
+	RedisTemplate redisTemplate;
+	
 	@Resource
 	private ComplainService complainService;
+	
 	
 	@RequestMapping(value = {"","/","index"})
 	public String index(Model model,Article article,@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer pageSize) {
@@ -73,8 +80,17 @@ public class IndexController {
 			a2.setHot(1);// 1 推荐文章的标志
 			a2.setStatus(1);//2.审核过的文章
 			//2.查询推荐下的所有的文章
-			PageInfo<Article> info = articleService.selects(a2, page, pageSize);	
-			model.addAttribute("info", info);
+			List<Article> redisArticle = redisTemplate.opsForList().range("hot_articles",0,-1);
+			if(redisArticle == null || redisArticle.size()==0) {
+				PageInfo<Article> info = articleService.selects(a2, page, pageSize);	
+				System.out.println("查询了mysql推荐文章");
+				redisTemplate.opsForList().leftPushAll("hot_article",info.getList().toArray());
+				model.addAttribute("info", info);
+			}else {
+				System.out.println("查询了redis推荐文章");
+				PageInfo<Article> info = new PageInfo<>(redisArticle);
+				model.addAttribute("info",info);
+			}
 		}
 		
 		//如果栏目不为空.则查询栏目下所有分类
@@ -96,12 +112,17 @@ public class IndexController {
        //页面右侧显示最近发布的5篇文章
 		Article last = new Article();
 		last.setStatus(1);
-		
-		PageInfo<Article> lastInfo = articleService.selects(last, 1, 5);
-		model.addAttribute("lastInfo", lastInfo);
-		
-		
-	
+		List<Article> redisArticle = redisTemplate.opsForList().range("new_articles",0,-1);
+		if(redisArticle == null || redisArticle.size()==0) {
+			PageInfo<Article> lastInfo = articleService.selects(last, 1, 5);
+			System.out.println("查询了mysql最新文章");
+			redisTemplate.opsForList().leftPushAll("new_article",lastInfo.getList().toArray());
+			model.addAttribute("lastInfo", lastInfo);
+		}else {
+			System.out.println("查询了redis最新文章");
+			PageInfo<Article> lastInfo = new PageInfo<>(redisArticle);
+			model.addAttribute("lastInfo",lastInfo);
+		}
 		return "index/index";
 		
 	}
@@ -114,7 +135,7 @@ public class IndexController {
 		ArticleWithBLOBs article = articleService.selectByPrimaryKey(id);
 		model.addAttribute("article", article);
 		
-		//查詢出評論
+		//查询出评论
 		Comment comment = new Comment();
 		comment.setArticleId(article.getId());
 		PageInfo<Comment> info = commentService.selects(comment, 1, 100);

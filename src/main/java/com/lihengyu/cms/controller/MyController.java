@@ -3,6 +3,7 @@ package com.lihengyu.cms.controller;
 import java.io.File;
 
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,16 +23,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.lihengyu.cms.domain.Article;
 import com.lihengyu.cms.domain.ArticleWithBLOBs;
 import com.lihengyu.cms.domain.Category;
 import com.lihengyu.cms.domain.Channel;
 import com.lihengyu.cms.domain.Comment;
+import com.lihengyu.cms.domain.Cs;
 import com.lihengyu.cms.domain.User;
 import com.lihengyu.cms.service.ArticleService;
 import com.lihengyu.cms.service.ChannelService;
 import com.lihengyu.cms.service.CommentService;
+import com.lihengyu.cms.service.CsService;
 
 /**
  * 
@@ -45,12 +51,17 @@ public class MyController {
 	@Resource
 	private ChannelService channelService;
 	
+	@Autowired
+	CsService service;
 	
 	@Resource
 	private ArticleService articleService;
 	
 	@Resource
 	private CommentService commentService;
+	
+	@Autowired
+	private KafkaTemplate<String,String> kafka;
 	//个人中心首页
 	@RequestMapping(value = {"","/","index"})
 	public String index() {
@@ -182,6 +193,9 @@ public class MyController {
 	@ResponseBody
 	@PostMapping("article/publish")
 	public boolean publish( MultipartFile file, ArticleWithBLOBs article,HttpServletRequest request) throws IllegalStateException, IOException {
+		String json = JSON.toJSONString(article);
+		System.out.println(json);
+		kafka.send("1708D","json");
 		String path="d:/pic/";//文件存放路径
 		//判断上传文件是否为空,若不为空,则上传
 		if(!file.isEmpty()) {
@@ -210,4 +224,34 @@ public class MyController {
 		
 	}
 	
+	
+	@RequestMapping("article/sc")
+	public String select(Model m,HttpServletRequest request,Cs cs, @RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(defaultValue = "3") Integer pageSize) {
+		PageInfo<Cs> info=service.select(cs, page, pageSize);
+		m.addAttribute("info",info);
+		return "my/article/sc";
+	}
+	
+	@RequestMapping("article/toadd")
+	public String toadd() {
+		return "my/article/add";
+	}
+	
+	@RequestMapping("article/add")
+	public String add(Cs cs) {
+		service.add(cs);
+		return "my/article/sc";
+	}
+	
+	@RequestMapping("article/del")
+	public String del(int id) {
+		try {
+			service.del(id);
+			return "true";
+		} catch (Exception e) {
+			// TODO: handle exception
+			return "flase";
+		}
+	}
 }

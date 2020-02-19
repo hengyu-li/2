@@ -27,4 +27,6 @@ public interface ChannelService {
 	 */
 	List<Category> selectsByChannelId(Integer channelId);
 	
+	int getChannelCount();
+	
 }

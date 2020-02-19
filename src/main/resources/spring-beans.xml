@@ -8,9 +8,11 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
-
-
-
+	
+	<import resource="classpath:applicationContext.xml"/>
+	<import resource="classpath:consumer.xml"/>
+	<import resource="classpath:producer.xml"/>
+	<import resource="classpath:redis.xml"/>
 	<!-- 1、注解扫描器 -->
 	<context:component-scan base-package="com.lihengyu.cms" >
 		<!-- 排除要要扫描的controller -->
